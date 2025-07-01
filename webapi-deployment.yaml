@@ -1,0 +1,24 @@
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: webapi
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: webapi
+  template:
+    metadata:
+      annotations:
+        dapr.io/enabled: "true"
+        dapr.io/app-id: "webapi"
+        dapr.io/app-port: "80"
+      labels:
+        app: webapi
+    spec:
+      containers:
+        - name: webapi
+          image: <your-acr>.azurecr.io/webapi:v1
+          ports:
+            - containerPort: 80
