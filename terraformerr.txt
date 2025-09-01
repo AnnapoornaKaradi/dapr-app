@@ -1,0 +1,8 @@
+│ Warning: Empty provider configuration blocks are not required
+│
+│   on ../../../EXOSBaseInfra-modules/akv_key/main.tf line 1:
+│    1: provider "azurerm" {
+│
+│ Remove the azurerm.default provider block from module.user_claims_key. Add
+│ azurerm.default to the list of configuration_aliases for azurerm in
+│ required_providers to define the provider configuration name.
