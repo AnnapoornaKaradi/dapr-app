@@ -1,0 +1,3 @@
+We are facing issue on our non prod cluster having dedicated ingress : uat-ingr-gadn
+As discussed with @Sagar, Sandeep currently for nginx max_body_size_limit = 20M which is causing our service to through 413 exception when we try to upload file more than 50 MB, could you please increase max_body_size_limit to 50 MB or slightly more than 50 MB for our nginx controller ,so that as per our business use case we can support atleast 50 MB file size on our non prod 
+Cluster  - fnf-lev-aks-nonprod-01
