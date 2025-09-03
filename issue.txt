@@ -11,3 +11,7 @@ when we upload we extract bytes and store in memory and then to they go to data 
  
 you can consider we are posting large data to one of our endpoint
  
+_____________________________________________________________________________________________________________________________________________________________
+
+
+Failed to create OAuth connection: ClientError: AADSTS500011: The resource principal named https://portal.azure.com/#view/Microsoft_Azure_ContainerRegistries/TokenResourceBlade/id/%2Fsubscriptions%2F03f39f76-065e-46fd-a116-ba6085c71481%2FresourceGroups%2Ffnf-rg-aks-development%2Fproviders%2FMicrosoft.ContainerRegistry%2Fregistries%2FCCOPaksACRdevPublicImages%2Ftokens%2Fdapracr was not found in the tenant named Fidelity National Financial. This can happen if the application has not been installed by the administrator of the tenant or consented to by any user in the tenant. You might have sent your authentication request to the wrong tenant. Trace ID: f70e4fe8-fc54-4f92-a4b2-710ec35d1d01 Correlation ID: be791d54-839f-4bd2-bcb7-0cd811d65b68 Timestamp: 2025-09-03 11:31:00Z
