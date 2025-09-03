@@ -1,0 +1,32 @@
+https://management.azure.com/subscriptions/<SUBSCRIPTION_ID>/resourceGroups/<RESOURCE_GROUP>/providers/Microsoft.ContainerRegistry/registries/<ACR_NAME>/tokens/<TOKEN_NAME>/listCredentials?api-version=2023-07-01
+
+
+{
+  "Content-Type": "application/json"
+}
+
+
+
+
+{
+  "type": "object",
+  "properties": {
+    "passwords": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": { "type": "string" },
+          "expiry": { "type": "string" }
+        }
+      }
+    }
+  }
+}
+
+
+
+@lessOrEquals(formatDateTime(item()?['expiry'], 'yyyy-MM-dd'), formatDateTime(addDays(utcNow(), 10), 'yyyy-MM-dd'))
+
+
+
