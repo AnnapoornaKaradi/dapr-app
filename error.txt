@@ -5,3 +5,292 @@ Release "sinhbgprocess" does not exist. Installing it now.
 metadata: map[APIVersion:v2 Annotations:map[] AppVersion:1.16.38 Condition: Dependencies:[] Deprecated:false Description:Sales inHere AI Agents. Home: Icon:https://www.google.com/images/branding/googlelogo/2x/googlelogo_color_272x92dp.png Keywords:[] KubeVersion: Maintainers:[] Name:sinhbgprocess Sources:[] Tags: Type:application Version:0.1.0] 
 ##[error]Flag --force has been deprecated, use --force-replace instead 
 Error: unable to continue with install: Service "sinhbgprocess" in namespace "dev-aks-sinhbgprocess" exists and cannot be imported into the current release: invalid ownership metadata; label validation error: missing key "app.kubernetes.io/managed-by": must be set to "Helm"; annotation validation error: missing key "meta.helm.sh/release-name": must be set to "sinhbgprocess"; annotation validation error: missing key "meta.helm.sh/release-namespace": must be set to "dev-aks-sinhbgprocess" 
+
+
+
+
+# ASP.NET
+# Build and test ASP.NET projects.
+# Add steps that publish symbols, save build artifacts, deploy, and more:
+# https://docs.microsoft.com/azure/devops/pipelines/apps/aspnet/build-aspnet-4
+
+trigger:
+- main
+stages:
+- stage: Build
+  pool:
+    name: Azure Pipelines
+  jobs:
+  - job: Build
+#Your build pipeline references a secret variable named ‘DockerPassword’. Create or edit the build pipeline for this YAML file, define the variable on the Variables tab, and then select the option to make it secret. See https://go.microsoft.com/fwlink/?linkid=865972
+    steps:
+    - bash: |
+          sudo apt-get install docker-engine -y
+          sudo service docker start
+
+    - task: Docker@2
+      inputs:
+        containerRegistry: 'icsechgdacrn1_pull-AIOperator'
+        command: login 
+
+    - task: Docker@2
+      displayName: 'Build and Push Image'
+      inputs:
+          containerRegistry: 'AIOperator-DEV-ACR'
+          repository: 'sinh/sinhbgprocess'
+          command: 'buildAndPush'
+          Dockerfile: 'App/src/Services/Fnf.SalesInHere.Services.BackgroundProcessor/Dockerfile'
+          buildContext: 'App'
+      
+
+    - task: HelmDeploy@0
+      inputs:
+        connectionType: 'Azure Resource Manager'
+        azureSubscription: 'FNF-RG-GEAI-Development'
+        azureResourceGroup: 'fnf-rg-aks-development'
+        kubernetesCluster: 'fnf-lev-aks-dev-01'
+        namespace: 'dev-aks-sinhbgprocess'
+        command: 'env'
+
+    - task: HelmDeploy@0
+      displayName: 'helm package'
+      inputs:
+        command: 'package'
+        chartPath: 'App/DeploymentScripts/BgProcessor'
+        
+    - task: PublishBuildArtifacts@1
+      displayName: 'Publish Artifact: Dev'
+      inputs:
+        PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+        ArtifactName: 'Dev'
+        publishLocation: 'Container'
+
+- stage: Dev
+  jobs:
+    - deployment: Dev_Deployment
+      environment: 'Dev'
+      pool: Az-Release-Dev
+      strategy:
+        runOnce:
+          deploy:
+              steps:
+              - task: AzureCLI@2
+                inputs:
+                  azureSubscription: 'FNF-RG-GEAI-Development'
+                  scriptType: 'ps'
+                  scriptLocation: 'inlineScript'
+                  inlineScript: |
+                    az aks get-credentials -n $(kubernetesClusterDev) -g $(azureResourceGroupDEV) --overwrite-existing -f ./.kube/config
+                    kubelogin convert-kubeconfig -l azurecli
+
+              - task: HelmInstaller@1
+                displayName: 'Install Helm 3'
+
+              - task: AzureCLI@2
+                displayName: 'helm uninstall'
+                inputs:
+                  azureSubscription: 'FNF-RG-GEAI-Development'
+                  scriptType: 'ps'
+                  scriptLocation: 'inlineScript'
+                  inlineScript: 'helm uninstall sinhbgprocess --namespace=dev-aks-sinhbgprocess'
+                  powerShellIgnoreLASTEXITCODE: true
+
+           #   - task: HelmDeploy@0
+           #     displayName: Deploy on Cluster 1
+           #     inputs:
+           #       connectionType: 'Azure Resource Manager'
+           #       azureSubscription: 'FNF-RG-GEAI-Development'
+           #       azureResourceGroup: 'fnf-rg-aks-development'
+           #       kubernetesCluster: 'fnf-lev-aks-dev-01'
+           #       namespace: 'dev-aks-sinhbgprocess'
+           #       command: 'upgrade'
+           #       chartType: 'FilePath'
+           #       chartPath: '$(Pipeline.Workspace)/Dev/sinhbgprocess-0.1.0.tgz'
+           #       releaseName: 'sinhbgprocess'
+           #       force: true
+           #       waitForExecution: false
+           #       arguments: '--set namespace=dev-aks-sinhbgprocess --set  image.tag=$(Build.BuildId) --set appVersion=$(Build.BuildId)  --set fullnameOverride=sinhbgprocess'
+           #       publishPipelineMetadata: false
+
+              - task: HelmDeploy@0
+                displayName: Deploy on Cluster 2
+                inputs:
+                  connectionType: 'Azure Resource Manager'
+                  azureSubscription: 'FNF-RG-GEAI-Development'
+                  azureResourceGroup: 'fnf-rg-aks-development'
+                  kubernetesCluster: 'fnf-lev-aks-dev-02'
+                  namespace: 'dev-aks-sinhbgprocess'
+                  command: 'upgrade'
+                  chartType: 'FilePath'
+                  chartPath: '$(Pipeline.Workspace)/Dev/sinhbgprocess-0.1.0.tgz'
+                  releaseName: 'sinhbgprocess'
+                  force: true
+                  waitForExecution: false
+                  arguments: '--set namespace=dev-aks-sinhbgprocess --set  image.tag=$(Build.BuildId) --set appVersion=$(Build.BuildId)  --set fullnameOverride=sinhbgprocess'
+                  publishPipelineMetadata: false
+
+
+
+- stage: UAT
+  jobs:
+  - job: Prepare_UAT
+    displayName: Prepare UAT env
+    steps:
+    - task: Docker@2
+      displayName: Pull
+      inputs:
+        containerRegistry: 'AIOperator-DEV-ACR'
+        repository: 'sinh/sinhbgprocess'
+        command: 'pull'
+        arguments: '$(devACRURI)/$(ContainerRepo):$(Build.BuildId)'
+        addPipelineData: false
+              
+    - task: Docker@2
+      displayName: Tag
+      inputs:
+       command: tag
+       arguments: '$(devACRURI)/$(ContainerRepo):$(Build.BuildId) $(uatACRURI)/$(ContainerRepo):$(Build.BuildId)'
+       addPipelineData: false
+              
+    - task: Docker@2
+      displayName: Push
+      inputs:
+        containerRegistry: 'AIOperator-NONPROD-ACR'
+        repository: '$(ContainerRepo)'
+        command: 'push'
+
+  - deployment: UAT_Deployment
+    environment: 'UAT'
+    dependsOn: Prepare_UAT
+    pool: Az-Release-Nonprod
+    strategy:
+      runOnce:
+        deploy:
+            steps:
+
+            - task: AzureCLI@2
+              inputs:
+                azureSubscription: 'FNF-RG-GEAI-NonProd'
+                scriptType: 'ps'
+                scriptLocation: 'inlineScript'
+                inlineScript: |
+                  az aks get-credentials -n $(kubernetesClusterUAT) -g $(azureResourceGroupUAT) --overwrite-existing -f ./.kube/config
+                  kubelogin convert-kubeconfig -l azurecli
+
+            - task: HelmInstaller@1
+              displayName: 'Install Helm 3'
+
+            - task: ExtractFiles@1
+              inputs:
+                archiveFilePatterns: '$(Pipeline.Workspace)/Dev/sinhbgprocess-0.1.0.tgz'
+                destinationFolder: '$(Pipeline.Workspace)/unzipped'
+                cleanDestinationFolder: true
+                overwriteExistingFiles: false
+
+            - task: AzureCLI@2
+              displayName: 'helm uninstall'
+              inputs:
+                azureSubscription: 'FNF-RG-GEAI-NonProd'
+                scriptType: 'ps'
+                scriptLocation: 'inlineScript'
+                inlineScript: 'helm uninstall sinhbgprocess --namespace=uat-aks-sinhbgprocess'
+                powerShellIgnoreLASTEXITCODE: true
+
+            - task: HelmDeploy@0
+              inputs:
+                connectionType: 'Azure Resource Manager'
+                azureSubscription: 'FNF-RG-GEAI-NonProd'
+                azureResourceGroup: 'FNF-RG-AKS-NonProd'
+                kubernetesCluster: 'fnf-lev-aks-nonprod-01'
+                namespace: 'uat-aks-sinhbgprocess'
+                command: 'upgrade'
+                chartType: 'FilePath'
+                chartPath: '$(Pipeline.Workspace)/Dev/sinhbgprocess-0.1.0.tgz'
+                releaseName: 'sinhbgprocess'
+                valueFile: '$(Pipeline.Workspace)/unzipped/sinhbgprocess/values-uat.yaml'
+                force: true
+                waitForExecution: false
+                arguments: '--set namespace=uat-aks-sinhbgprocess --set  image.tag=$(Build.BuildId) --set appVersion=$(Build.BuildId)  --set fullnameOverride=sinhbgprocess'
+                publishPipelineMetadata: false
+              
+- stage: PROD
+  jobs:
+  - job: Prepare_PROD
+    displayName: Prepare PROD env
+    steps:
+    - task: Docker@2
+      displayName: Pull
+      inputs:
+        containerRegistry: 'AIOperator-NONPROD-ACR'
+        repository: 'sinh/sinhbgprocess'
+        command: 'pull'
+        arguments: '$(uatACRURI)/$(ContainerRepo):$(Build.BuildId)'
+        addPipelineData: false
+              
+    - task: Docker@2
+      displayName: Tag
+      inputs:
+       command: tag
+       arguments: '$(uatACRURI)/$(ContainerRepo):$(Build.BuildId) $(prodACRURI)/$(ContainerRepo):$(Build.BuildId)'
+       addPipelineData: false
+              
+    - task: Docker@2
+      displayName: Push
+      inputs:
+        containerRegistry: 'AIOperator-PROD-ACR'
+        repository: '$(ContainerRepo)'
+        command: 'push'
+
+  - deployment: PROD_Deployment
+    environment: 'PROD'
+    dependsOn: Prepare_PROD
+    pool: Az-Release-prod
+    strategy:
+      runOnce:
+        deploy:
+            steps:
+
+            - task: AzureCLI@2
+              inputs:
+                azureSubscription: 'FNF-RG-GEAI-Prod-AIOperator'
+                scriptType: 'ps'
+                scriptLocation: 'inlineScript'
+                inlineScript: |
+                  az aks get-credentials -n $(kubernetesClusterPROD) -g $(azureResourceGroupPROD) --overwrite-existing -f ./.kube/config
+                  kubelogin convert-kubeconfig -l azurecli
+
+            - task: HelmInstaller@1
+              displayName: 'Install Helm 3'
+
+            - task: ExtractFiles@1
+              inputs:
+                archiveFilePatterns: '$(Pipeline.Workspace)/Dev/sinhbgprocess-0.1.0.tgz'
+                destinationFolder: '$(Pipeline.Workspace)/unzipped'
+                cleanDestinationFolder: true
+                overwriteExistingFiles: false
+
+            - task: AzureCLI@2
+              displayName: 'helm uninstall'
+              inputs:
+                azureSubscription: 'FNF-RG-GEAI-Prod-AIOperator'
+                scriptType: 'ps'
+                scriptLocation: 'inlineScript'
+                inlineScript: 'helm uninstall sinhbgprocess --namespace=prod-aks-sinhbgprocess'
+                powerShellIgnoreLASTEXITCODE: true
+
+            - task: HelmDeploy@0
+              inputs:
+                connectionType: 'Azure Resource Manager'
+                azureSubscription: 'FNF-RG-GEAI-Prod-AIOperator'
+                azureResourceGroup: 'FNF-RG-AKS-Prod'
+                kubernetesCluster: 'fnf-lev-aks-prod-01'
+                namespace: 'prod-aks-sinhbgprocess'
+                command: 'upgrade'
+                chartType: 'FilePath'
+                chartPath: '$(Pipeline.Workspace)/Dev/sinhbgprocess-0.1.0.tgz'
+                releaseName: 'sinhbgprocess'
+                valueFile: '$(Pipeline.Workspace)/unzipped/sinhbgprocess/values-prod.yaml'
+                force: true
+                waitForExecution: false
+                arguments: '--set namespace=prod-aks-sinhbgprocess --set  image.tag=$(Build.BuildId) --set appVersion=$(Build.BuildId)  --set fullnameOverride=sinhbgprocess'
+                publishPipelineMetadata: false
