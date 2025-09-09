@@ -1,0 +1,7 @@
+
+Flag --force has been deprecated, use --force-replace instead 
+Error: unable to continue with install: Service "sinhbgprocess" in namespace "dev-aks-sinhbgprocess" exists and cannot be imported into the current release: invalid ownership metadata; label validation error: missing key "app.kubernetes.io/managed-by": must be set to "Helm"; annotation validation error: missing key "meta.helm.sh/release-name": must be set to "sinhbgprocess"; annotation validation error: missing key "meta.helm.sh/release-namespace": must be set to "dev-aks-sinhbgprocess" 
+Release "sinhbgprocess" does not exist. Installing it now. 
+metadata: map[APIVersion:v2 Annotations:map[] AppVersion:1.16.38 Condition: Dependencies:[] Deprecated:false Description:Sales inHere AI Agents. Home: Icon:https://www.google.com/images/branding/googlelogo/2x/googlelogo_color_272x92dp.png Keywords:[] KubeVersion: Maintainers:[] Name:sinhbgprocess Sources:[] Tags: Type:application Version:0.1.0] 
+##[error]Flag --force has been deprecated, use --force-replace instead 
+Error: unable to continue with install: Service "sinhbgprocess" in namespace "dev-aks-sinhbgprocess" exists and cannot be imported into the current release: invalid ownership metadata; label validation error: missing key "app.kubernetes.io/managed-by": must be set to "Helm"; annotation validation error: missing key "meta.helm.sh/release-name": must be set to "sinhbgprocess"; annotation validation error: missing key "meta.helm.sh/release-namespace": must be set to "dev-aks-sinhbgprocess" 
