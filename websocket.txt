@@ -1,0 +1,37 @@
+Problem Description:
+================
+You are using Blazor Server and the Websocket-SignalR connection fails. 
+ 
+Environment:
+=========
+Pre-Prod
+Hosted in AKS
+Using AKS ingress load balancer.
+ 
+Summary:
+==========
+•	Tried testing with Postman and we saw 404's:
+o	 
+o	 
+•	We discussed 2 approaches:
+o	Use Azure SignalR which is managed connection proxy for SignalR:
+	Azure SignalR Service internals | Microsoft Learn
+	Tutorial: Build a Blazor Server chat app - Azure SignalR | Azure Docs
+	With Azure SignalR, the connections are offloaded from App server, and the connection scaling is decoupled from business logic scaling.
+o	Further troubleshooting:
+	SignalR Apps cannot be scaled horizontally without a backplane. So, if we have more than one server, the connection request can go to other node which doesn't know about the connectionId:
+	ASP.NET Core SignalR production hosting and scaling | Microsoft Learn
+	We can try with setting the number of servers to 1 to eliminate this situation.
+	If this still doesn't help, we will have to understand whether the AKS ingress supports WebSocket's:
+ 
+   nginx.ingress.kubernetes.io/session-cookie-expires: "172800"
+    nginx.ingress.kubernetes.io/session-cookie-max-age: "172800"
+    nginx.ingress.kubernetes.io/affinity-mode: persistent
+    nginx.ingress.kubernetes.io/session-cookie-hash: sha1
+ 
+    #new changes for testing aks blazor websocket issue fix
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
+    nginx.ingress.kubernetes.io/proxy-request-buffering: "off"
+    # nginx.ingress.kubernetes.io/upgrade: "websocket"
+    # nginx.ingress.kubernetes.io/connection-proxy-header: "upgrade"
