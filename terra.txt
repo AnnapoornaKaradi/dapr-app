@@ -1,0 +1,17 @@
+2025-09-11T07:07:21.4879513Z ‌╷‌
+2025-09-11T07:07:21.4891610Z ‌│‌ ‌Error: ‌No configuration files‌
+2025-09-11T07:07:21.4912516Z ‌│‌ ‌
+2025-09-11T07:07:21.4920210Z ‌│‌ ‌The directory F:\azdevops_release\fnf\1\_work\r233\a\_Fnf.K8s\ccopinfra‌
+2025-09-11T07:07:21.4922322Z ‌│‌ ‌contains no Terraform configuration files.‌
+2025-09-11T07:07:21.4924030Z ‌╵‌
+2025-09-11T07:07:21.4927057Z ‌
+2025-09-11T07:07:21.5055362Z [command]F:\azdevops_release\fnf\1\_work\_tool\terraform\1.11.4\x64\terraform.exe providers
+2025-09-11T07:07:21.5062155Z [command]F:\azdevops_release\fnf\1\_work\_tool\terraform\1.11.4\x64\terraform.exe plan -var-file=F:\azdevops_release\fnf\1\_work\r233\a/_Fnf.K8s/ccopinfra/prod/primary/prod_eastus02_vars_cluster02.tfvars -detailed-exitcode
+2025-09-11T07:07:22.1117260Z ‌╷‌
+2025-09-11T07:07:22.1117920Z ‌│‌ ‌Error: ‌No configuration files‌
+2025-09-11T07:07:22.1118484Z ‌│‌ ‌
+2025-09-11T07:07:22.1118891Z ‌│‌ ‌Plan requires configuration to be present. Planning without a configuration‌
+2025-09-11T07:07:22.1119368Z ‌│‌ ‌would mark everything for destruction, which is normally not what is‌
+2025-09-11T07:07:22.1119840Z ‌│‌ ‌desired. If you would like to destroy everything, run plan with the‌
+2025-09-11T07:07:22.1120324Z ‌│‌ ‌-destroy option. Otherwise, create a Terraform configuration file (.tf‌
+2025-09-11T07:07:22.1120618Z ‌│‌ ‌file) and try again.‌
