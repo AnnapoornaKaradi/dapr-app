@@ -15,3 +15,44 @@
 2025-09-11T07:07:22.1119840Z ‌│‌ ‌desired. If you would like to destroy everything, run plan with the‌
 2025-09-11T07:07:22.1120324Z ‌│‌ ‌-destroy option. Otherwise, create a Terraform configuration file (.tf‌
 2025-09-11T07:07:22.1120618Z ‌│‌ ‌file) and try again.‌
+
+
+
+
+
+
+Error: ‌Module not installed‌
+2025-09-11T07:16:48.1482408Z ‌│‌ ‌
+2025-09-11T07:16:48.1482580Z ‌│‌ ‌  on main.tf line 32:‌
+2025-09-11T07:16:48.1482771Z ‌│‌ ‌  32: ‌module &quot;env_aks&quot;‌ {‌
+2025-09-11T07:16:48.1483042Z ‌│‌ ‌
+2025-09-11T07:16:48.1483269Z ‌│‌ ‌This module is not yet installed. Run &quot;terraform init&quot; to install all‌
+2025-09-11T07:16:48.1483544Z ‌│‌ ‌modules required by this configuration.‌
+2025-09-11T07:16:48.1483753Z ‌╵‌
+2025-09-11T07:16:48.1483914Z ‌
+2025-09-11T07:16:48.1744363Z [command]F:\azdevops_release\fnf\1\_work\_tool\terraform\1.11.4\x64\terraform.exe providers
+2025-09-11T07:16:48.1753556Z [command]F:\azdevops_release\fnf\1\_work\_tool\terraform\1.11.4\x64\terraform.exe plan -var-file=F:\azdevops_release\fnf\1\_work\r233\a/_Fnf.K8s/ccopinfra/prod/primary/prod_eastus02_vars_cluster02.tfvars -detailed-exitcode
+2025-09-11T07:16:48.4845368Z ‌╷‌
+2025-09-11T07:16:48.4847193Z ‌│‌ ‌Error: ‌Backend initialization required, please run &quot;terraform init&quot;‌
+2025-09-11T07:16:48.4847692Z ‌│‌ ‌
+2025-09-11T07:16:48.4848183Z ‌│‌ ‌Reason: Initial configuration of the requested backend &quot;azurerm&quot;‌
+2025-09-11T07:16:48.4854863Z ‌│‌ ‌
+2025-09-11T07:16:48.4855420Z ‌│‌ ‌The &quot;backend&quot; is the interface that Terraform uses to store state,‌
+2025-09-11T07:16:48.4859522Z ‌│‌ ‌perform operations, etc. If this message is showing up, it means that the‌
+2025-09-11T07:16:48.4860127Z ‌│‌ ‌Terraform configuration youre using is using a custom configuration for‌
+2025-09-11T07:16:48.4860530Z ‌│‌ ‌the Terraform backend.‌
+2025-09-11T07:16:48.4860838Z ‌│‌ ‌
+2025-09-11T07:16:48.4861248Z ‌│‌ ‌Changes to backend configurations require reinitialization. This allows‌
+2025-09-11T07:16:48.4861718Z ‌│‌ ‌Terraform to set up the new configuration, copy existing state, etc. Please‌
+2025-09-11T07:16:48.4863623Z ‌│‌ ‌run‌
+2025-09-11T07:16:48.4864082Z ‌│‌ ‌&quot;terraform init&quot; with either the &quot;-reconfigure&quot; or &quot;-migrate-state&quot; flags‌
+2025-09-11T07:16:48.4864448Z ‌│‌ ‌to‌
+2025-09-11T07:16:48.4868473Z ‌│‌ ‌use the current configuration.‌
+2025-09-11T07:16:48.4868913Z ‌│‌ ‌
+2025-09-11T07:16:48.4869313Z ‌│‌ ‌If the change reason above is incorrect, please verify your configuration‌
+2025-09-11T07:16:48.4882275Z ‌│‌ ‌hasnt changed and try again. At this point, no changes to your existing‌
+2025-09-11T07:16:48.4882850Z ‌│‌ ‌configuration or state have been made.‌
+2025-09-11T07:16:48.4883353Z ‌╵‌
+2025-09-11T07:16:48.5220191Z ##[warning]Can't find loc string for key: TerraformPlanFailed
+2025-09-11T07:16:48.5306183Z ##[error]Error: TerraformPlanFailed 1
+2025-09-11T07:16:48.5383058Z ##[section]Finishing: Terraform : azurerm plan Cluster2
